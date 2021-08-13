@@ -13,6 +13,8 @@ import rip.deadcode.oboro.model.Value
 import java.lang.reflect.Type
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.Result.Companion.failure
+import kotlin.Result.Companion.success
 
 
 fun load(context: LoadContext) {
@@ -30,14 +32,20 @@ fun load(context: LoadContext) {
             }
         },
         onFailure = {
-            System.err.println("Error: ")
+            System.err.println("Error:profile \"${context.profile}\" not found.")
         }
     )
 }
 
 fun loadProfileFile(profile: String): Result<Profile> {
 
-    val path = getOboroHome().resolve(profile)
+    val home = getOboroHome()
+    val json = home.resolve("${profile}.json")
+    val path = when {
+        Files.exists(json) -> json
+        else -> TODO()
+    }
+
     return parseProfile(path)
 }
 
@@ -57,9 +65,9 @@ fun parseProfile(path: Path): Result<Profile> {
         val profile = Files.newBufferedReader(path).use { reader ->
             gson.fromJson(reader, Profile::class.java)
         }
-        Result.success(profile)
+        success(profile)
     } catch (e: Exception) {
-        Result.failure(e)
+        failure(e)
     }
 }
 
