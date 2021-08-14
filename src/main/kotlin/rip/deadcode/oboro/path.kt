@@ -4,8 +4,8 @@ import java.nio.file.Path
 
 
 fun getCurrent(): Path {
-    val current = System.getProperty("")
-    return fileSystem.getPath("user.home").toAbsolutePath().normalize()
+    val current = System.getProperty("user.home")
+    return fileSystem.getPath(current).toAbsolutePath().normalize()
 }
 
 fun getOboroHome(): Path {
