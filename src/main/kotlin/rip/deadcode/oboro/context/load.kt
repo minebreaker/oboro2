@@ -6,6 +6,7 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import rip.deadcode.oboro.LoadContext
 import rip.deadcode.oboro.ProfileNotFound
+import rip.deadcode.oboro.getCurrent
 import rip.deadcode.oboro.getOboroHome
 import rip.deadcode.oboro.model.Conflict
 import rip.deadcode.oboro.model.Conflict.Overwrite
@@ -40,11 +41,14 @@ fun load(context: LoadContext) {
 
 fun loadProfileFile(profile: String): Result<Profile> {
 
+    val current = getCurrent()
+    val currentJson = current.resolve("${profile}.json")
     val home = getOboroHome()
-    val json = home.resolve("${profile}.json")
+    val homeJson = home.resolve("${profile}.json")
     val path = when {
-        Files.exists(json) -> json
-        else               -> throw  ProfileNotFound("Profile not found: \"${profile}\"")
+        Files.exists(currentJson) -> currentJson
+        Files.exists(homeJson)    -> homeJson
+        else                      -> throw ProfileNotFound("Profile not found: \"${profile}\"")
     }
 
     return parseProfile(path)

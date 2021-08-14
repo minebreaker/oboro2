@@ -13,11 +13,13 @@ Python 3.5
 
 # Profile resolving
 
-1. `~/.oboro/[[profile_name]].json`
+1. `./[[profile_name]].json`
+2. `~/.oboro/[[profile_name]].json`
 
 
 # TODOs
 
+* overwrite
 * .env
-* current directory
+* yaml
 * dry-run
