@@ -11,10 +11,13 @@ Python 3.5
 ```
 
 
-Save profile jsons in `~/.oboro/[[profile_name]].json`
+# Profile resolving
+
+1. `~/.oboro/[[profile_name]].json`
 
 
 # TODOs
 
 * .env
 * current directory
+* dry-run

@@ -6,8 +6,7 @@ import rip.deadcode.oboro.context.load
 
 fun main(args: Array<String>) {
 
-    val context = parseArgs(args)
-    when (context) {
+    when (val context = parseArgs(args)) {
         is InitContext -> init(context)
         is LoadContext -> load(context)
         HelpContext    -> TODO()

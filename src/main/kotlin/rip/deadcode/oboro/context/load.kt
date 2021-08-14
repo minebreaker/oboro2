@@ -5,6 +5,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import rip.deadcode.oboro.LoadContext
+import rip.deadcode.oboro.ProfileNotFound
 import rip.deadcode.oboro.getOboroHome
 import rip.deadcode.oboro.model.Conflict
 import rip.deadcode.oboro.model.Conflict.Overwrite
@@ -43,7 +44,7 @@ fun loadProfileFile(profile: String): Result<Profile> {
     val json = home.resolve("${profile}.json")
     val path = when {
         Files.exists(json) -> json
-        else               -> TODO()
+        else               -> throw  ProfileNotFound("Profile not found: \"${profile}\"")
     }
 
     return parseProfile(path)
@@ -68,12 +69,11 @@ fun parseProfile(path: Path): Result<Profile> {
 
 private class ProfileDeserializer : JsonDeserializer<Profile> {
 
+    // TODO proper error handling
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Profile {
         val variableObj = json.asJsonObject.get("variable")
-        // TODO proper error handling
         val variables = variableObj.asJsonObject.entrySet().map { (k, v) ->
             when {
-                // TODO proper error handling
                 v.isJsonObject -> {
                     val w = v.asJsonObject
                     val value = w["value"].asString
@@ -95,6 +95,7 @@ private class ProfileDeserializer : JsonDeserializer<Profile> {
 fun parseConflict(s: String): Conflict {
     return when (s) {
         Overwrite.command -> Overwrite
+        // TODO
 //        Append.command -> Append
 //        Skip.command -> Skip
 //        Error.command -> Error

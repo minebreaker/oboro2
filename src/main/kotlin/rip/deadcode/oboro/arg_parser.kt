@@ -20,11 +20,7 @@ fun parseArgs(args: Array<String>): ExecutionContext {
 }
 
 private fun parseInitCommand(commands: CommandLine): ExecutionContext {
-    val subcommand = commands.args.getOrNull(1)
-
-    if (subcommand == null) {
-        return HelpContext
-    }
+    val subcommand = commands.args.getOrNull(1) ?: return HelpContext
 
     return parseShell(subcommand).fold(
         onSuccess = {
@@ -37,11 +33,7 @@ private fun parseInitCommand(commands: CommandLine): ExecutionContext {
 }
 
 private fun parseLoadCommand(commands: CommandLine): ExecutionContext {
-    val profile = commands.args.getOrNull(1)
-
-    if (profile == null) {
-        return HelpContext
-    }
+    val profile = commands.args.getOrNull(1) ?: return HelpContext
 
     return LoadContext(profile)
 }
