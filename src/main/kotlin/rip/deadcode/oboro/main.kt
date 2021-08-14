@@ -10,6 +10,6 @@ fun main(args: Array<String>) {
     when (context) {
         is InitContext -> init(context)
         is LoadContext -> load(context)
-        HelpContext -> TODO()
+        HelpContext    -> TODO()
     }
 }

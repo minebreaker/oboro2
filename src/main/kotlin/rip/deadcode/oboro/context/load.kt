@@ -5,7 +5,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import rip.deadcode.oboro.LoadContext
-import rip.deadcode.oboro.fileSystem
+import rip.deadcode.oboro.getOboroHome
 import rip.deadcode.oboro.model.Conflict
 import rip.deadcode.oboro.model.Conflict.Overwrite
 import rip.deadcode.oboro.model.Profile
@@ -43,15 +43,10 @@ fun loadProfileFile(profile: String): Result<Profile> {
     val json = home.resolve("${profile}.json")
     val path = when {
         Files.exists(json) -> json
-        else -> TODO()
+        else               -> TODO()
     }
 
     return parseProfile(path)
-}
-
-fun getOboroHome(): Path {
-    val userHome = System.getProperty("user.home")!!  // User's home directory; Guaranteed to have the value
-    return fileSystem.getPath(userHome, ".oboro").toAbsolutePath().normalize()
 }
 
 fun parseProfile(path: Path): Result<Profile> {
@@ -103,8 +98,8 @@ fun parseConflict(s: String): Conflict {
 //        Append.command -> Append
 //        Skip.command -> Skip
 //        Error.command -> Error
-        else -> throw IllegalStateException()
+        else              -> throw IllegalStateException()
     }
 }
 
-val pathSeparator: String = System.getProperty("path.separator")
+private val pathSeparator: String = System.getProperty("path.separator")

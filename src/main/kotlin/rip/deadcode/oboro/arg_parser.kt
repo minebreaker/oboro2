@@ -15,7 +15,7 @@ fun parseArgs(args: Array<String>): ExecutionContext {
     return when (command) {
         InitContext.command -> parseInitCommand(commands)
         LoadContext.command -> parseLoadCommand(commands)
-        else -> HelpContext
+        else                -> HelpContext
     }
 }
 
@@ -49,6 +49,7 @@ private fun parseLoadCommand(commands: CommandLine): ExecutionContext {
 private fun parseShell(str: String): Result<Shell> {
     return when (str) {
         Shell.Bash.command -> Result.success(Shell.Bash)
+        Shell.PowerShell.command -> Result.success(Shell.PowerShell)
         else -> Result.failure(InvalidCommand("Unsupported shell name: \"${str}\""))
     }
 }

@@ -1,7 +1,5 @@
 package rip.deadcode.oboro
 
-import java.lang.Exception
-
 
 sealed interface ExecutionContext
 
@@ -17,11 +15,14 @@ data class LoadContext(val profile: String) : ExecutionContext {
     }
 }
 
-object HelpContext: ExecutionContext
+object HelpContext : ExecutionContext
 
 enum class Shell {
     Bash {
         override val command: String = "bash"
+    },
+    PowerShell {
+        override val command: String = "powershell"
     }
     ;
 
