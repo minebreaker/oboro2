@@ -4,9 +4,9 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
+import rip.deadcode.oboro.EnvironmentVariableAlreadySet
 import rip.deadcode.oboro.LoadContext
 import rip.deadcode.oboro.ProfileNotFound
-import rip.deadcode.oboro.getCurrent
 import rip.deadcode.oboro.getOboroHome
 import rip.deadcode.oboro.model.Conflict
 import rip.deadcode.oboro.model.Conflict.Append
@@ -25,13 +25,16 @@ import kotlin.system.exitProcess
 
 fun load(context: LoadContext) {
 
-    val profile = loadProfileFile(context.profile)
+    val pathSeparator = context.dependencies.pathSeparator
+    val environments = context.dependencies.environments
+
+    val profile = loadProfileFile(context)
     profile.fold(
         onSuccess = {
             it.variable.forEach { valueObj ->
 
-                val env = System.getenv(valueObj.key)
-                val valueStr = valueObj.value.joinToString(pathSeparator)
+                val env = environments[valueObj.key]
+                val valueStr = valueObj.value.joinToString()
 
                 when (valueObj.conflict) {
                     Overwrite ->
@@ -45,8 +48,7 @@ fun load(context: LoadContext) {
                         println("${valueObj.key}=${valueWithEnv}")
                     }
                     Error     -> {
-                        System.err.println("Error: environment variable already set: current=\"${env}\"")
-                        exitProcess(1)
+                        throw EnvironmentVariableAlreadySet("Error: environment variable already set: current=\"${env}\"")
                     }
                     Skip      -> Unit  // Do nothing
                 }
@@ -62,11 +64,14 @@ fun load(context: LoadContext) {
     )
 }
 
-fun loadProfileFile(profile: String): Result<Profile> {
+fun loadProfileFile(context: LoadContext): Result<Profile> {
 
-    val current = getCurrent()
-    val currentJson = current.resolve("${profile}.json")
-    val home = getOboroHome()
+    val dependencies = context.dependencies
+    val profile = context.profile
+
+    val fs = dependencies.fileSystem
+    val currentJson = fs.getPath("${profile}.json")
+    val home = getOboroHome(dependencies)
     val homeJson = home.resolve("${profile}.json")
     val path = when {
         Files.exists(currentJson) -> currentJson
@@ -128,5 +133,3 @@ fun parseConflict(s: String): Conflict {
         else              -> throw IllegalStateException("Unsupported conflict strategy: \"${s}\"")
     }
 }
-
-private val pathSeparator: String = System.getProperty("path.separator")

@@ -12,7 +12,7 @@ fun init(context: InitContext) {
 
     // Creates home directory if not exist
     try {
-        val home = getOboroHome()
+        val home = getOboroHome(context.dependencies)
         Files.createDirectories(home)
     } catch (e: IOException) {
         // Print stacktrace and keep going

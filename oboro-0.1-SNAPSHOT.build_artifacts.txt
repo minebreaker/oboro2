@@ -1,0 +1,3 @@
+[EXECUTABLE]
+oboro-0.1-SNAPSHOT.exe
+
