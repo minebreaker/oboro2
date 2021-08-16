@@ -9,7 +9,10 @@ import rip.deadcode.oboro.ProfileNotFound
 import rip.deadcode.oboro.getCurrent
 import rip.deadcode.oboro.getOboroHome
 import rip.deadcode.oboro.model.Conflict
+import rip.deadcode.oboro.model.Conflict.Append
+import rip.deadcode.oboro.model.Conflict.Error
 import rip.deadcode.oboro.model.Conflict.Overwrite
+import rip.deadcode.oboro.model.Conflict.Skip
 import rip.deadcode.oboro.model.Profile
 import rip.deadcode.oboro.model.Value
 import java.lang.reflect.Type
@@ -17,6 +20,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
+import kotlin.system.exitProcess
 
 
 fun load(context: LoadContext) {
@@ -24,17 +28,36 @@ fun load(context: LoadContext) {
     val profile = loadProfileFile(context.profile)
     profile.fold(
         onSuccess = {
-            it.variable.forEach { v ->
-                val valueStr = if (v.value.size == 1) {
-                    v.value[0]
-                } else {
-                    v.value.joinToString(pathSeparator)
+            it.variable.forEach { valueObj ->
+
+                val env = System.getenv(valueObj.key)
+                val valueStr = valueObj.value.joinToString(pathSeparator)
+
+                when (valueObj.conflict) {
+                    Overwrite ->
+                        println("${valueObj.key}=${valueStr}")
+                    Append    -> {
+                        val valueWithEnv = if (env == null) {
+                            valueStr
+                        } else {
+                            env + pathSeparator + valueStr
+                        }
+                        println("${valueObj.key}=${valueWithEnv}")
+                    }
+                    Error     -> {
+                        System.err.println("Error: environment variable already set: current=\"${env}\"")
+                        exitProcess(1)
+                    }
+                    Skip      -> Unit  // Do nothing
                 }
-                println("${v.key}=${valueStr}")
+
             }
         },
         onFailure = {
-            System.err.println("Error:profile \"${context.profile}\" not found.")
+            when (it) {
+                is ProfileNotFound -> System.err.println(it.message)
+                else               -> it.printStackTrace()
+            }
         }
     )
 }
@@ -99,11 +122,10 @@ private class ProfileDeserializer : JsonDeserializer<Profile> {
 fun parseConflict(s: String): Conflict {
     return when (s) {
         Overwrite.command -> Overwrite
-        // TODO
-//        Append.command -> Append
-//        Skip.command -> Skip
-//        Error.command -> Error
-        else              -> throw IllegalStateException()
+        Append.command    -> Append
+        Skip.command      -> Skip
+        Error.command     -> Error
+        else              -> throw IllegalStateException("Unsupported conflict strategy: \"${s}\"")
     }
 }
 

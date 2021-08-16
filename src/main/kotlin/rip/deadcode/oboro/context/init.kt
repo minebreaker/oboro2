@@ -1,5 +1,6 @@
 package rip.deadcode.oboro.context
 
+import com.google.common.annotations.VisibleForTesting
 import rip.deadcode.oboro.InitContext
 import rip.deadcode.oboro.Shell
 import rip.deadcode.oboro.getOboroHome
@@ -27,7 +28,8 @@ fun init(context: InitContext) {
 }
 
 
-private val bash = """
+@VisibleForTesting
+internal val bash = """
     # Oboro helpers for bash
     
     function oboro() {
@@ -41,7 +43,8 @@ private val bash = """
     # eval "${"$"}(oboro-runner init bash)"
 """.trimIndent()
 
-private val powershell = """
+@VisibleForTesting
+internal val powershell = """
     # Oboro helpers for PowerShell
     
     function oboro {
