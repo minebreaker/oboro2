@@ -2,10 +2,11 @@ package rip.deadcode.oboro
 
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
+import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 
 
-private val options = Options()
+val options = Options()
     .addOption("v", "version", false, "Shows version")
     .addOption("h", "help", false, "Shows help")
 
