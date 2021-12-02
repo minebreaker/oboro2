@@ -17,6 +17,10 @@ data class LoadContext(val dependencies: Dependencies, val profile: String) : Ex
     }
 }
 
+object VersionContext : ExecutionContext {
+    const val command: String = "version"
+}
+
 object HelpContext : ExecutionContext
 
 data class Dependencies(

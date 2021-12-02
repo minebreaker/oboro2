@@ -6,6 +6,8 @@ import org.apache.commons.cli.Options
 
 
 private val options = Options()
+    .addOption("v", "version", false, "Shows version")
+    .addOption("h", "help", false, "Shows help")
 
 fun parseArgs(args: Array<String>, dependencies: Dependencies): ExecutionContext {
     val parser = DefaultParser()
@@ -13,9 +15,14 @@ fun parseArgs(args: Array<String>, dependencies: Dependencies): ExecutionContext
 
     val command = commands.args.getOrNull(0)
     return when (command) {
-        InitContext.command -> parseInitCommand(dependencies, commands)
-        LoadContext.command -> parseLoadCommand(dependencies, commands)
-        else                -> HelpContext
+        InitContext.command    -> parseInitCommand(dependencies, commands)
+        LoadContext.command    -> parseLoadCommand(dependencies, commands)
+        VersionContext.command -> VersionContext
+        else                   ->
+            when {
+                (commands.hasOption("version")) -> VersionContext
+                else                            -> HelpContext
+            }
     }
 }
 
@@ -40,8 +47,8 @@ private fun parseLoadCommand(dependencies: Dependencies, commands: CommandLine):
 
 private fun parseShell(str: String): Result<Shell> {
     return when (str) {
-        Shell.Bash.command -> Result.success(Shell.Bash)
+        Shell.Bash.command       -> Result.success(Shell.Bash)
         Shell.PowerShell.command -> Result.success(Shell.PowerShell)
-        else -> Result.failure(InvalidCommand("Unsupported shell name: \"${str}\""))
+        else                     -> Result.failure(InvalidCommand("Unsupported shell name: \"${str}\""))
     }
 }

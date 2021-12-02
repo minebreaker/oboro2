@@ -2,6 +2,7 @@ package rip.deadcode.oboro
 
 import rip.deadcode.oboro.context.init
 import rip.deadcode.oboro.context.load
+import rip.deadcode.oboro.context.version
 import java.nio.file.FileSystems
 
 
@@ -20,8 +21,9 @@ fun main(args: Array<String>) {
 fun main(args: Array<String>, dependencies: Dependencies) {
 
     when (val context = parseArgs(args, dependencies)) {
-        is InitContext -> init(context)
-        is LoadContext -> load(context)
-        HelpContext    -> TODO()
+        is InitContext    -> init(context)
+        is LoadContext    -> load(context)
+        is VersionContext -> version()
+        is HelpContext    -> TODO()
     }
 }
