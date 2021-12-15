@@ -12,6 +12,7 @@ import rip.deadcode.oboro.getOboroHome
 import rip.deadcode.oboro.model.Conflict
 import rip.deadcode.oboro.model.Conflict.Append
 import rip.deadcode.oboro.model.Conflict.Error
+import rip.deadcode.oboro.model.Conflict.Insert
 import rip.deadcode.oboro.model.Conflict.Overwrite
 import rip.deadcode.oboro.model.Conflict.Skip
 import rip.deadcode.oboro.model.Profile
@@ -38,20 +39,20 @@ fun load(context: LoadContext) {
                 val valueStr = valueObj.value.joinToString()
 
                 when (valueObj.conflict) {
-                    Overwrite ->
+                    Overwrite      ->
                         println("${valueObj.key}=${valueStr}")
-                    Append    -> {
-                        val valueWithEnv = if (env == null) {
-                            valueStr
-                        } else {
-                            env + pathSeparator + valueStr
+                    Insert, Append -> {
+                        val valueWithEnv = when {
+                            env == null                 -> valueStr
+                            valueObj.conflict == Append -> env + pathSeparator + valueStr
+                            else  /* Insert */          -> valueStr + pathSeparator + env
                         }
                         println("${valueObj.key}=${valueWithEnv}")
                     }
-                    Error     -> {
+                    Error          -> {
                         throw EnvironmentVariableAlreadySet("Error: environment variable already set: current=\"${env}\"")
                     }
-                    Skip      -> Unit  // Do nothing
+                    Skip           -> Unit  // Do nothing
                 }
 
             }
@@ -107,17 +108,17 @@ private class ProfileDeserializer : JsonDeserializer<Profile> {
         val variableObj = json.asJsonObject.get("variable")
         val variables = variableObj.asJsonObject.entrySet().map { (k, v) ->
             when {
-                v.isJsonObject -> {
+                v.isJsonObject    -> {
                     val w = v.asJsonObject
                     val value = w["value"].asString
                     val conflict = parseConflict(w["conflict"]?.asString ?: Overwrite.command)
                     Value(k, listOf(value), conflict)
                 }
-                v.isJsonArray ->
+                v.isJsonArray     ->
                     Value(k, v.asJsonArray.map { it.asString }, Overwrite)
                 v.isJsonPrimitive ->
                     Value(k, listOf(v.asString), Overwrite)
-                else -> throw IllegalStateException()
+                else              -> throw IllegalStateException()
             }
         }.toList()
 
@@ -129,6 +130,7 @@ fun parseConflict(s: String): Conflict {
     return when (s) {
         Overwrite.command -> Overwrite
         Append.command    -> Append
+        Insert.command    -> Insert
         Skip.command      -> Skip
         Error.command     -> Error
         else              -> throw IllegalStateException("Unsupported conflict strategy: \"${s}\"")

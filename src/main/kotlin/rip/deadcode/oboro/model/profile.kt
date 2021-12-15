@@ -15,6 +15,9 @@ enum class Conflict {
     Overwrite {
         override val command: String = "overwrite"
     },
+    Insert {
+        override val command: String = "insert"
+    },
     Append {
         override val command: String = "append"
     },

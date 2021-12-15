@@ -79,7 +79,8 @@ class LoadTest {
             "key1" to "previous value1",
             "key2" to "previous value2",
             "key3" to "previous value3",
-            "key4" to "previous value4"
+            "key4" to "previous value4",
+            "key5" to "previous value5"
         )
         val dependencies = dependencies(os, environments)
 
@@ -100,6 +101,10 @@ class LoadTest {
                         "value" to "skip",
                         "conflict" to "skip"
                     ),
+                    "key5" to mapOf(
+                        "value" to "insert",
+                        "conflict" to "insert"
+                    ),
                     "key4" to mapOf(
                         "value" to "error",
                         "conflict" to "error"
@@ -118,6 +123,7 @@ class LoadTest {
             result, """
                 key1=overwrite
                 key2=previous value2${dependencies.pathSeparator}append
+                key5=insert${dependencies.pathSeparator}previous value5
             """
         )
     }
