@@ -20,7 +20,7 @@ Python 3.5
   "variable": {
     "PATH": {
       "value": "C:\\lib\\jdk\\graalvm-ce-java17-windows-amd64-21.3.0\\graalvm-ce-java17-21.3.0\\bin",
-      "conflict": "append"
+      "conflict": "insert"
     },
     "JAVA_HOME": {
       "value": "C:\\lib\\jdk\\graalvm-ce-java17-windows-amd64-21.3.0\\graalvm-ce-java17-21.3.0",
@@ -29,6 +29,8 @@ Python 3.5
   }
 }
 ```
+
+See [JSON Schema](https://github.com/minebreaker/oboro2/blob/master/profile.yaml) for the detail.
 
 ## Resolving
 
@@ -41,4 +43,4 @@ Python 3.5
 * .env
 * yaml
 * dry-run
-* insert
+* extends

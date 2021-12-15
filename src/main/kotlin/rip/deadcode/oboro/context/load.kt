@@ -109,7 +109,7 @@ private class ProfileDeserializer : JsonDeserializer<Profile> {
         val variables = variableObj.asJsonObject.entrySet().map { (k, v) ->
             when {
                 v.isJsonObject    -> {
-                    val w = v.asJsonObject
+                    val w = v.asJsonObject // FIXME: should accept list
                     val value = w["value"].asString
                     val conflict = parseConflict(w["conflict"]?.asString ?: Overwrite.command)
                     Value(k, listOf(value), conflict)

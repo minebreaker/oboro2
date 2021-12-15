@@ -1,0 +1,46 @@
+type: object
+properties:
+  variable:
+    type: object
+    description: |
+      Defines environment variables.
+      Each key is a name of the environment variable you want to set.
+      Each value is a definition of it.
+    patternProperties:
+      ".*":
+        $ref: "#/definitions/value"
+definitions:
+  value:
+    oneOf:
+      - type: string
+        description: |
+          The value of the environment variable you want to set for the key.
+      - type: array
+        items:
+          type: string
+        description: |
+          The values of the environment variable you want to set for the key.
+          Items are contat by the os-dependent path separator
+          (typically ";" on windows, ":" on linux).
+      - type: object
+        properties:
+          value:
+            type: string
+          conflict:
+            $ref: "#/definitions/conflict"
+  conflict:
+    enum:
+      - overwrite
+      - append
+      - insert
+      - skip
+      - error
+    default: overwrite
+    description: |
+      Conflict resolution strategy.
+      
+      If "overwrite", overwrites the currently set environment variable and replace it to the specified value.
+      If "append", appends the specified value to the last of the current values.
+      If "insert", similar to "append", but inserts into the head of the current values.
+      If "skip", ignore and leave the currenttly set environment variable as is.
+      If "error", the program throws an error and exits with non-0 error code.
