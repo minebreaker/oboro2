@@ -13,7 +13,24 @@ Python 3.5
 ```
 
 
-# Profile resolving
+# Profile
+
+```json
+{
+  "variable": {
+    "PATH": {
+      "value": "C:\\lib\\jdk\\graalvm-ce-java17-windows-amd64-21.3.0\\graalvm-ce-java17-21.3.0\\bin",
+      "conflict": "append"
+    },
+    "JAVA_HOME": {
+      "value": "C:\\lib\\jdk\\graalvm-ce-java17-windows-amd64-21.3.0\\graalvm-ce-java17-21.3.0",
+      "conflict": "overwrite"
+    }
+  }
+}
+```
+
+## Resolving
 
 1. `./[[profile_name]].json`
 2. `~/.oboro/[[profile_name]].json`
@@ -21,7 +38,7 @@ Python 3.5
 
 # TODOs
 
-* overwrite
 * .env
 * yaml
 * dry-run
+* insert

@@ -4,6 +4,7 @@ import rip.deadcode.oboro.context.help
 import rip.deadcode.oboro.context.init
 import rip.deadcode.oboro.context.load
 import rip.deadcode.oboro.context.version
+import rip.deadcode.oboro.utils.guessOs
 import java.nio.file.FileSystems
 
 
@@ -14,7 +15,8 @@ fun main(args: Array<String>) {
             fileSystem = FileSystems.getDefault(),
             environments = System.getenv(),
             home = System.getProperty("user.home"),
-            pathSeparator = System.getProperty("path.separator")
+            pathSeparator = System.getProperty("path.separator"),
+            os = guessOs()
         )
     )
 }

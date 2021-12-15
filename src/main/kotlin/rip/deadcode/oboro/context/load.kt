@@ -6,6 +6,7 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import rip.deadcode.oboro.EnvironmentVariableAlreadySet
 import rip.deadcode.oboro.LoadContext
+import rip.deadcode.oboro.Os
 import rip.deadcode.oboro.ProfileNotFound
 import rip.deadcode.oboro.getOboroHome
 import rip.deadcode.oboro.model.Conflict
@@ -15,12 +16,12 @@ import rip.deadcode.oboro.model.Conflict.Overwrite
 import rip.deadcode.oboro.model.Conflict.Skip
 import rip.deadcode.oboro.model.Profile
 import rip.deadcode.oboro.model.Value
+import rip.deadcode.oboro.utils.getIgnoreCase
 import java.lang.reflect.Type
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
-import kotlin.system.exitProcess
 
 
 fun load(context: LoadContext) {
@@ -33,7 +34,7 @@ fun load(context: LoadContext) {
         onSuccess = {
             it.variable.forEach { valueObj ->
 
-                val env = environments[valueObj.key]
+                val env = environments.getEnv(valueObj.key, context)
                 val valueStr = valueObj.value.joinToString()
 
                 when (valueObj.conflict) {
@@ -131,5 +132,15 @@ fun parseConflict(s: String): Conflict {
         Skip.command      -> Skip
         Error.command     -> Error
         else              -> throw IllegalStateException("Unsupported conflict strategy: \"${s}\"")
+    }
+}
+
+private fun Map<String, String>.getEnv(key: String, context: LoadContext): String? {
+    // Windows treats env vars in case-insensitive manner.
+    // TODO should be configurable
+    return if (context.dependencies.os == Os.Windows) {
+        this.getIgnoreCase(key)
+    } else {
+        this[key]
     }
 }

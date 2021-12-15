@@ -2,7 +2,6 @@ package rip.deadcode.oboro
 
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.DefaultParser
-import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 
 
@@ -14,8 +13,7 @@ fun parseArgs(args: Array<String>, dependencies: Dependencies): ExecutionContext
     val parser = DefaultParser()
     val commands = parser.parse(options, args)
 
-    val command = commands.args.getOrNull(0)
-    return when (command) {
+    return when (commands.args.getOrNull(0)) {
         InitContext.command    -> parseInitCommand(dependencies, commands)
         LoadContext.command    -> parseLoadCommand(dependencies, commands)
         VersionContext.command -> VersionContext

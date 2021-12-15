@@ -26,9 +26,28 @@ object HelpContext : ExecutionContext
 data class Dependencies(
     val fileSystem: FileSystem,
     val environments: Map<String, String>,
+    val os: Os,
     val home: String,
     val pathSeparator: String
 )
+
+enum class Os {
+    Windows {
+        override val command: String = "windows"
+    },
+    Linux {
+        override val command: String = "linux"
+    },
+    Mac {
+        override val command: String = "mac"
+    },
+    Unknown {
+        override val command: String = "unknown"
+    }
+    ;
+
+    abstract val command: String
+}
 
 enum class Shell {
     Bash {

@@ -27,26 +27,28 @@ fun redirectingStdout(block: () -> Unit): String {
     return baos.toString(StandardCharsets.UTF_8)
 }
 
-fun dependencies(os: Os, environments: Map<String, String> = mapOf()): Dependencies {
+fun dependencies(os: TestTarget, environments: Map<String, String> = mapOf()): Dependencies {
     return when (os) {
-        Os.Unix    -> {
+        TestTarget.Unix    -> {
             Dependencies(
                 fileSystem = Jimfs.newFileSystem(Configuration.unix()),
                 environments = environments,
                 home = "/home/username",
-                pathSeparator = ":"
+                pathSeparator = ":",
+                os = Os.Linux
             )
         }
-        Os.Windows -> Dependencies(
+        TestTarget.Windows -> Dependencies(
             fileSystem = Jimfs.newFileSystem(Configuration.windows()),
             environments = environments,
             home = "C:\\User\\username",
-            pathSeparator = ":"
+            pathSeparator = ";",
+            os = Os.Windows
         )
     }
 }
 
-enum class Os {
+enum class TestTarget {
     Unix, Windows
 }
 
@@ -64,5 +66,5 @@ fun saveJson(path: Path, model: Map<String, Any>) {
 fun assertOutput(result: String, expected: String) {
     // Adds line break to the end of the expected
     // and replace line break to the default of the os running the test
-    assertThat(result).isEqualTo((expected + "\n").replace("\n", System.getProperty("line.separator")))
+    assertThat(result).isEqualTo((expected.trimIndent() + "\n").replace("\n", System.getProperty("line.separator")))
 }

@@ -3,12 +3,11 @@ package rip.deadcode.oboro
 import org.junit.jupiter.api.TestFactory
 import rip.deadcode.izvestia.Core.expect
 import rip.deadcode.izvestia.Core.test
-import java.lang.Exception
 
 class LoadTest {
 
     @TestFactory
-    fun testLoad() = test("load").parameterized(Os.Unix, Os.Windows).run { os ->
+    fun testLoad() = test("load").parameterized(TestTarget.Unix, TestTarget.Windows).run { os ->
 
         val dependencies = dependencies(os)
 
@@ -36,44 +35,45 @@ class LoadTest {
                 key1=value1
                 key2=value2
                 key3=value3
-            """.trimIndent()
+            """
         )
     }
 
     @TestFactory
-    fun testLoadCurrentDir() = test("load current directory").parameterized(Os.Unix, Os.Windows).run { os ->
+    fun testLoadCurrentDir() =
+        test("load current directory").parameterized(TestTarget.Unix, TestTarget.Windows).run { os ->
 
-        val dependencies = dependencies(os)
+            val dependencies = dependencies(os)
 
-        saveJson(
-            dependencies.fileSystem.getPath("./test.json"),
-            mapOf(
-                "variable" to mapOf(
-                    "key1" to "value1",
-                    "key2" to arrayOf("value2"),
-                    "key3" to mapOf(
-                        "value" to "value3",
-                        "conflict" to "overwrite"
+            saveJson(
+                dependencies.fileSystem.getPath("./test.json"),
+                mapOf(
+                    "variable" to mapOf(
+                        "key1" to "value1",
+                        "key2" to arrayOf("value2"),
+                        "key3" to mapOf(
+                            "value" to "value3",
+                            "conflict" to "overwrite"
+                        )
                     )
                 )
             )
-        )
 
-        val result = redirectingStdout {
-            main(arrayOf("load", "test"), dependencies)
-        }
+            val result = redirectingStdout {
+                main(arrayOf("load", "test"), dependencies)
+            }
 
-        assertOutput(
-            result, """
+            assertOutput(
+                result, """
                 key1=value1
                 key2=value2
                 key3=value3
-            """.trimIndent()
-        )
-    }
+            """
+            )
+        }
 
     @TestFactory
-    fun testLoadConflicts() = test("load conflicts").parameterized(Os.Unix, Os.Windows).run { os ->
+    fun testLoadConflicts() = test("load conflicts").parameterized(TestTarget.Unix, TestTarget.Windows).run { os ->
 
         val environments = mapOf(
             "key1" to "previous value1",
@@ -118,7 +118,54 @@ class LoadTest {
             result, """
                 key1=overwrite
                 key2=previous value2${dependencies.pathSeparator}append
-            """.trimIndent()
+            """
         )
     }
+
+
+    @TestFactory
+    @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
+    fun testLoadCaseInsensitiveness() =
+        test("load conflicts").parameterized(TestTarget.Unix, TestTarget.Windows).run { os ->
+            val dependencies = dependencies(
+                os, mapOf(
+                    "Key" to "value"
+                )
+            )
+
+            saveJsonHome(
+                dependencies,
+                "test.json",
+                mapOf(
+                    "variable" to mapOf(
+                        "key" to mapOf(
+                            "key" to "key",
+                            "value" to "overwriting",
+                            "conflict" to "append"
+                        ),
+                    )
+                )
+            )
+
+            val result = redirectingStdout {
+                main(arrayOf("load", "test"), dependencies)
+            }
+
+            when (os) {
+                TestTarget.Unix    -> {
+                    assertOutput(
+                        result, """
+                        key=overwriting
+                    """
+                    )
+                }
+                TestTarget.Windows -> {
+                    assertOutput(
+                        result, """
+                        key=value;overwriting
+                    """
+                    )
+                }
+            }
+        }
 }
