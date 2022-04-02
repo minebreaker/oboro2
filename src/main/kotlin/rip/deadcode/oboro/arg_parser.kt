@@ -16,6 +16,7 @@ fun parseArgs(args: Array<String>, dependencies: Dependencies): ExecutionContext
     return when (commands.args.getOrNull(0)) {
         InitContext.command    -> parseInitCommand(dependencies, commands)
         LoadContext.command    -> parseLoadCommand(dependencies, commands)
+        ListContext.command    -> ListContext(dependencies)
         VersionContext.command -> VersionContext
         else                   ->
             when {

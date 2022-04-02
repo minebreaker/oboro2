@@ -17,6 +17,12 @@ data class LoadContext(val dependencies: Dependencies, val profile: String) : Ex
     }
 }
 
+data class ListContext(val dependencies: Dependencies) : ExecutionContext {
+    companion object {
+        const val command: String = "list"
+    }
+}
+
 object VersionContext : ExecutionContext {
     const val command: String = "version"
 }
